@@ -2,6 +2,7 @@
 FastAPI 엔드포인트 테스트
 
 pytest를 사용하여 API 엔드포인트를 테스트합니다.
+test_api가 실제로 백엔드의 엔드투엔드 프로세스 체크이다.
 
 실행 방법:
     uv run pytest tests/test_api.py -v
