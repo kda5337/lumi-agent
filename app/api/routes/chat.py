@@ -6,6 +6,7 @@ LangGraph 에이전트를 호출하여 사용자 메시지를 처리합니다.
 엔드포인트:
     POST /chat/          - 채팅 메시지 전송
 """
+
 from collections.abc import AsyncGenerator
 
 from fastapi import APIRouter, HTTPException
@@ -45,7 +46,9 @@ async def chat(request: ChatRequest) -> ChatResponse:
             -d '{"message": "오늘 방송 언제야?", "session_id": "user123"}'
         ```
     """
-    logger.info(f"📩 채팅 요청: session={request.session_id}, message={request.message[:50]}...")
+    logger.info(
+        f"📩 채팅 요청: session={request.session_id}, message={request.message[:50]}..."
+    )
 
     try:
         # Step 1: LangGraph 그래프 가져오기
@@ -54,8 +57,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
         # Step 2: 초기 상태 생성
         # 사용자 메시지를 messages에 포함
         initial_state = {
-
-            "messages": [HumanMessage(content=request.message)], 
+            "messages": [HumanMessage(content=request.message)],
             "intent": None,
             "retrieved_docs": [],
             "tool_name": None,
@@ -116,7 +118,6 @@ async def stream_with_status(
     session_id: str,
     user_id: str | None = None,
 ) -> AsyncGenerator[tuple[str | None, str | None, str | None, str | None], None]:
-
     """
     노드 상태 + 토큰 스트리밍 결합
 
@@ -201,13 +202,13 @@ async def stream_with_status(
                 token = msg.content or ""
                 if token:
                     final_response += token
-                    yield (None, token, None, None) # 토큰이 발생했다고 전달
+                    yield (None, token, None, None)  # 토큰이 발생했다고 전달
 
     # 세션 히스토리에 저장
     if final_response:
         if session_id not in SESSION_STORE:
-            SESSION_STORE[session_id] = [] # session_id별 대화가 저장
-        SESSION_STORE[session_id].append(new_message) # new_message은 사용자 질문
+            SESSION_STORE[session_id] = []  # session_id별 대화가 저장
+        SESSION_STORE[session_id].append(new_message)  # new_message은 사용자 질문
         SESSION_STORE[session_id].append(AIMessage(content=final_response))
         logger.debug(f"💾 [StreamWithStatus] 세션 저장: {session_id}")
 
